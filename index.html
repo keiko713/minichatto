@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>minichatto</title>
+<link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+<style type="text/css">
+body {
+  margin: 20px;
+}
+.chatcanvas {
+  float: none;
+}
+.inputbox {
+}
+</style>
+</head>
+<body>
+<div class="chatcanvas well span6" id="id_chatcanvas">
+</div>
+<br>
+<div class="inputbox span6">
+<input type="text" class="span6" name="mytext" id="id_mytext" autocomplete="off">
+</div>
+<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+var myName = false;
+
+// Update chat window
+function updateChat(message) {
+    newMsgNode = document.createElement('div');
+    newMsgNode.className = 'chat';
+    newMsgNode.innerHTML = '<b>' + message.name + '</b>: ' + message.text;
+    $('#id_chatcanvas').append(newMsgNode);
+}
+
+// Welcome message
+function welcomeMsg(name) {
+    newMsgNode = document.createElement('div');
+    newMsgNode.className = 'chat';
+    if (name != myName) {
+        newMsgNode.innerHTML = '*-*-*-* <b>' + name + '</b> joined this chat! *-*-*-*';
+    } else {
+        newMsgNode.innerHTML = '*-*-*-* Welcome <b>' + name + '</b>! *-*-*-*';
+    }
+    $('#id_chatcanvas').append(newMsgNode);
+}
+
+// Create SocketIO instance, connect
+var socket = io.connect();
+
+// Add a connect listener
+socket.on('connect', function() {
+    console.log('Clinet has connected to the server!');
+});
+// Add a message listener
+socket.on('message', function(data) {
+    message = JSON.parse(data);
+    if(message.type == 'welcome') {
+        console.log('Received a welcome info from the server!', message);
+        welcomeMsg(message.data.name);
+    } else {
+        console.log('Received a message from the server!', message);
+        updateChat(message.data);
+    }
+});
+// Add a disconnect listener
+socket.on('disconnect', function() {
+    console.log('The client has disconnected!');
+});
+
+
+// Sends a message to the server via sockets
+function sendMessageToServer(message) {
+    console.log('Send a message: ' + message);
+    socket.emit('message', message);
+    var msgObj = {
+        time: (new Date()).getTime(),
+        text: message,
+        name: myName,
+    };
+    updateChat(msgObj);
+}
+function welcomeInfoToServer(name) {
+    console.log('Join a chat as: ' + name);
+    socket.emit('welcome', name);
+    myName = name;
+    welcomeMsg(myName);
+}
+
+$('#id_mytext').keyup(function(event){
+    if(event.keyCode == 13){
+        var message = $(this).val();
+        if(message != null && message !== '') {
+            if(myName === false) {
+                welcomeInfoToServer(message);
+            } else {
+                sendMessageToServer(message);
+            }
+            $(this).val('');
+        }
+    }
+});
+</script>
+</body>
+</html>
