@@ -48,9 +48,11 @@ a {
 </head>
 <body>
 <div class="minichatto">
+<a href="#" class="makesmall" id="id_makesmall">
 <div class="chattitle" id="id_chattitle">
-Chat Window <div class="right"><a href="#" class="makesmall" id="id_makesmall">_</a></div>
+Chat Window
 </div>
+</a>
 <div class="chatcanvas" id="id_chatcanvas">
 </div>
 <div class="inputbox span6" id="id_inputbox">
@@ -146,13 +148,11 @@ $('#id_makesmall').click(function(event){
         // opened
         $('#id_chatcanvas').hide();
         $('#id_inputbox').hide();
-        this.innerHTML = '↑';
         opened = false;
     } else {
         // closed
         $('#id_chatcanvas').show();
         $('#id_inputbox').show();
-        this.innerHTML = '_';
     }
 });
 </script>
