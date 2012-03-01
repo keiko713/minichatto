@@ -1,29 +1,68 @@
 <html>
 <head>
 <title>minichatto</title>
-<link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
 <style type="text/css">
 body {
-  margin: 20px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  color: #333;
+  background-color: white;
 }
-.chatcanvas {
-  float: none;
+a {
+  color: #08C;
+  text-decoration: none;
 }
 .inputbox {
+}
+.minichatto {
+  bottom: 0;
+  position: fixed;
+  right: 0;
+  width: 250px;
+}
+.chatcanvas {
+  background-color: #EEE;
+  height: 250px;
+  overflow: auto;
+  padding: 3px;
+  width: 244px;
+}
+.chattitle {
+  height: 18px;
+  background-color: #333;
+  color: #EEE;
+  padding: 3px 5px 3px 5px;
+  width: 240px;
+}
+.span6 {
+  width: 250px;
+}
+.right {
+  float: right;
+}
+.makesmall {
+  color: #EEE;
 }
 </style>
 </head>
 <body>
-<div class="chatcanvas well span6" id="id_chatcanvas">
+<div class="minichatto">
+<div class="chattitle" id="id_chattitle">
+Chat Window <div class="right"><a href="#" class="makesmall" id="id_makesmall">_</a></div>
 </div>
-<br>
-<div class="inputbox span6">
-<input type="text" class="span6" name="mytext" id="id_mytext" autocomplete="off">
+<div class="chatcanvas" id="id_chatcanvas">
 </div>
+<div class="inputbox span6" id="id_inputbox">
+<textarea placeholder="Type your name to join this chat..." class="span6" name="mytext" id="id_mytext" rows="2">
+</textarea>
+</div>
+</div><!-- /minichatto -->
 <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
 var myName = false;
+var opened = true;
 
 // Update chat window
 function updateChat(message) {
@@ -38,9 +77,9 @@ function welcomeMsg(name) {
     newMsgNode = document.createElement('div');
     newMsgNode.className = 'chat';
     if (name != myName) {
-        newMsgNode.innerHTML = '*-*-*-* <b>' + name + '</b> joined this chat! *-*-*-*';
+        newMsgNode.innerHTML = '==== <b>' + name + '</b> joined this chat! ====';
     } else {
-        newMsgNode.innerHTML = '*-*-*-* Welcome <b>' + name + '</b>! *-*-*-*';
+        newMsgNode.innerHTML = '==== Welcome <b>' + name + '</b>! ====';
     }
     $('#id_chatcanvas').append(newMsgNode);
 }
@@ -93,11 +132,27 @@ $('#id_mytext').keyup(function(event){
         if(message != null && message !== '') {
             if(myName === false) {
                 welcomeInfoToServer(message);
+                $('#id_mytext').attr('placeholder', '');
             } else {
                 sendMessageToServer(message);
             }
             $(this).val('');
         }
+    }
+});
+
+$('#id_makesmall').click(function(event){
+    if(opened) {
+        // opened
+        $('#id_chatcanvas').hide();
+        $('#id_inputbox').hide();
+        this.innerHTML = '↑';
+        opened = false;
+    } else {
+        // closed
+        $('#id_chatcanvas').show();
+        $('#id_inputbox').show();
+        this.innerHTML = '_';
     }
 });
 </script>
