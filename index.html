@@ -66,12 +66,19 @@ Chat Window
 var myName = false;
 var opened = true;
 
+// Auto scroll of chat area
+function autoScroll() {
+    var obj = document.getElementById('id_chatcanvas');
+    obj.scrollTop = obj.scrollHeight;
+}
+
 // Update chat window
 function updateChat(message) {
     newMsgNode = document.createElement('div');
     newMsgNode.className = 'chat';
     newMsgNode.innerHTML = '<b>' + message.name + '</b>: ' + message.text;
     $('#id_chatcanvas').append(newMsgNode);
+    autoScroll();
 }
 
 // Welcome message
@@ -84,6 +91,7 @@ function welcomeMsg(name) {
         newMsgNode.innerHTML = '==== Welcome <b>' + name + '</b>! ====';
     }
     $('#id_chatcanvas').append(newMsgNode);
+    autoScroll();
 }
 
 // Create SocketIO instance, connect
@@ -131,7 +139,7 @@ function welcomeInfoToServer(name) {
 $('#id_mytext').keyup(function(event){
     if(event.keyCode == 13){
         var message = $(this).val();
-        if(message != null && message !== '') {
+        if(message != null && message != false) {
             if(myName === false) {
                 welcomeInfoToServer(message);
                 $('#id_mytext').attr('placeholder', '');
